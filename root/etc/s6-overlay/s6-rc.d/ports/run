@@ -1,0 +1,21 @@
+#!/usr/bin/with-contenv sh
+
+fail() {
+  echo "wgproton: fail $*" >&2
+}
+
+nat() {
+  natpmpc -g 10.2.0.1 -a "$i" "$port" tcp 60 \
+  | grep -Po '(?<=Mapped public port )\d{5}' > /portmapping/"$i" \
+  || fail "extend PORT$i: $port"
+}
+
+mkdir -p /portmapping
+
+while true; do
+  for i in $(seq 5); do
+    eval port="\${PORT$i:-5000$i}"
+    [ "$port" = null ] || nat
+  done
+  sleep 50
+done

@@ -1,0 +1,12 @@
+#!/usr/bin/with-contenv bash
+if [[ -z "$ROUTESUBNET" ]]; then
+  exit
+fi
+if [[ -z "$ROUTEDEV" ]]; then
+  ROUTEDEV="$(ip route show default | grep -oP '(?<= dev )\S+')" # device
+fi
+if [[ -z "$ROUTEGATEWAY" ]]; then
+  ROUTEGATEWAY="$(ip route show default | grep -oP '(?<= via )\S+')" # default gateway
+fi
+echo "wgproton: adding route: $ROUTESUBNET"
+ip route add "$ROUTESUBNET" via "$ROUTEGATEWAY" dev "$ROUTEDEV"
